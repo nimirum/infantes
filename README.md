@@ -1,6 +1,6 @@
 # Infantes
 
-A munincipality-level birth rate visualization for Interactive Data Visualization course, University of Helsinki, Spring term 2017.
+A munincipality-level birth rate visualization for Interactive Data Visualization course, University of Helsinki, Spring term 2018.
 
 
 ## Project folder structure
