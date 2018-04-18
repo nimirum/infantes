@@ -1,0 +1,26 @@
+{
+  "name": "infantes-frontend",
+  "version": "1.0.0",
+  "description": "A birth rate visualization of Finnish munincipalities for Interactive Data Visualization course in Helsinki University",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimirum/infantes.git"
+  },
+  "keywords": [
+    "finnish",
+    "munincipality",
+    "birth",
+    "rate",
+    "visualization"
+  ],
+  "author": "Milla Peltoniemi, Viivi Nissilä, Timo Jääskeläinen, Johannes Elmnäinen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nimirum/infantes/issues"
+  },
+  "homepage": "https://github.com/nimirum/infantes#readme"
+}
