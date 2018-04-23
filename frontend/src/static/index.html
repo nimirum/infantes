@@ -1,15 +1,856 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <link href="https://fonts.googleapis.com/css?family=Average|Fjalla+One" rel="stylesheet">
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
-        <link href='app.css' rel='stylesheet' type='text/css'>
-        <title>Infantes</title>
-        <meta description="A visualization of Finnish munincipalities' birth rate" />
-    </head>
-    <body>
-        <div id="root" class="container-fluid">Hello world</div>
-        <script type="text/javascript" src="app.bundle.js" charset="utf-8"></script>
-    </body>
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>D3 bubble/scatter chart</title>
+  
+  
+  
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+
+  <!-- https://bl.ocks.org/ColinEberhardt/389c76c6a544af9f0cab -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://npmcdn.com/d3fc-rebind@4.1.1/build/d3fc-rebind.js"></script>
+<script src="https://npmcdn.com/d3fc-data-join@4.1.1/build/d3fc-data-join.js"></script>
+<script _src="https://npmcdn.com/d3fc-label-layout@5.0.1/build/d3fc-label-layout.js">
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-selection'), require('d3fc-data-join'), require('d3fc-rebind')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-selection', 'd3fc-data-join', 'd3fc-rebind'], factory) :
+  (factory((global.fc = global.fc || {}),global.d3,global.d3,global.fc,global.fc));
+}(this, (function (exports,d3Array,d3Selection,d3fcDataJoin,d3fcRebind) { 'use strict';
+
+var functor = (function (d) {
+  return typeof d === 'function' ? d : function () {
+    return d;
+  };
+});
+
+var label = (function (layoutStrategy) {
+
+    var decorate = function decorate() {};
+    var size = function size() {
+        return [0, 0];
+    };
+    var position = function position(d, i) {
+        return [d.x, d.y];
+    };
+
+    let places = function() {};
+
+    var strategy = layoutStrategy || function (x) {
+        return x;
+    };
+    var component = function component() {};
+
+    var dataJoin$$1 = d3fcDataJoin.dataJoin('g', 'label');
+
+    var label = function label(selection) {
+
+        selection.each(function (data, index, group) {
+
+            var g = dataJoin$$1(d3Selection.select(group[index]), data).call(component);
+
+            // obtain the rectangular bounding boxes for each child
+            var nodes = g.nodes();
+            var childRects = nodes.map(function (node, i) {
+                var d = d3Selection.select(node).datum();
+                var childPos = position(d, i, nodes);
+                var childSize = size(d, i, nodes);
+                var childPlaces = places(d, i, nodes);
+                return {
+                    hidden: false,
+                    x: childPos[0],
+                    y: childPos[1],
+                    width: childSize[0],
+                    height: childSize[1],
+                    placements: childPlaces
+                };
+            });
+
+            // apply the strategy to derive the layout. The strategy does not change the order
+            // or number of label.
+            var layout = strategy(childRects);
+
+            g.attr('style', function (_, i) {
+                return 'display:' + (layout[i].hidden ? 'none' : 'inherit');
+            }).attr('transform', function (_, i) {
+                const l = layout[i];
+                let transf = 'translate(' + l.x + ', ' + l.y + ')';
+                if(l.angle) {
+                    transf += ` rotate(${l.angle})`;
+                }
+                return transf;
+            })
+
+            //DEBUG
+            .attr('data-poly', function (_, i) { return layout[i].__polygon; })
+            .attr('data-layout', function (_, i) { return layout[i].location; })
+            
+            // set the layout width / height so that children can use SVG layout if required
+            .attr('layout-width', function (_, i) {
+                return layout[i].width;
+            }).attr('layout-height', function (_, i) {
+                return layout[i].height;
+            }).attr('anchor-x', function (d, i, g) {
+                return position(d, i, g)[0] - layout[i].x;
+            }).attr('anchor-y', function (d, i, g) {
+                return position(d, i, g)[1] - layout[i].y;
+            }).attr('anchor-rot', function (d, i, g) {
+                //If the label is rotated, we must rotate the origin anchor point back into place:
+                return (layout[i].angle ? -layout[i].angle : null);
+            });
+
+            g.call(component);
+
+            decorate(g, data, index);
+        });
+    };
+
+    d3fcRebind.rebindAll(label, dataJoin$$1, d3fcRebind.include('key'));
+    d3fcRebind.rebindAll(label, strategy);
+
+    label.size = function () {
+        if (!arguments.length) {
+            return size;
+        }
+        size = functor(arguments.length <= 0 ? undefined : arguments[0]);
+        return label;
+    };
+
+    label.position = function () {
+        if (!arguments.length) {
+            return position;
+        }
+        position = functor(arguments.length <= 0 ? undefined : arguments[0]);
+        return label;
+    };
+
+    label.placements = function () {
+        if (!arguments.length) {
+            return places;
+        }
+        places = functor(arguments.length <= 0 ? undefined : arguments[0]);
+        return label;
+    };
+
+    label.component = function () {
+        if (!arguments.length) {
+            return component;
+        }
+        component = arguments.length <= 0 ? undefined : arguments[0];
+        return label;
+    };
+
+    label.decorate = function () {
+        if (!arguments.length) {
+            return decorate;
+        }
+        decorate = arguments.length <= 0 ? undefined : arguments[0];
+        return label;
+    };
+
+    return label;
+});
+
+var textLabel = (function (layoutStrategy) {
+
+    var padding = 2;
+    var value = function value(x) {
+        return x;
+    };
+
+    var textJoin = d3fcDataJoin.dataJoin('text');
+    var rectJoin = d3fcDataJoin.dataJoin('rect');
+    var pointJoin = d3fcDataJoin.dataJoin('circle');
+
+    var textLabel = function textLabel(selection) {
+        selection.each(function (data, index, group) {
+
+            var node = group[index];
+            var nodeSelection = d3Selection.select(node);
+
+            var width = Number(node.getAttribute('layout-width'));
+            var height = Number(node.getAttribute('layout-height'));
+            var rect = rectJoin(nodeSelection, [data]);
+            rect.attr('width', width).attr('height', height);
+
+            var anchorX = Number(node.getAttribute('anchor-x'));
+            var anchorY = Number(node.getAttribute('anchor-y'));
+            const anchorRot = Number(node.getAttribute('anchor-rot'));
+            var circle = pointJoin(nodeSelection, [data]);
+            circle.attr('r', 2).attr('cx', anchorX).attr('cy', anchorY)
+                  .attr('transform', anchorRot ? `rotate(${anchorRot})` : null);
+
+            var text = textJoin(nodeSelection, [data]);
+            text.enter().attr('dy', '0.9em').attr('transform', 'translate(' + padding + ', ' + padding + ')');
+            text.text(value);
+        });
+    };
+
+    textLabel.padding = function () {
+        if (!arguments.length) {
+            return padding;
+        }
+        padding = arguments.length <= 0 ? undefined : arguments[0];
+        return textLabel;
+    };
+
+    textLabel.value = function () {
+        if (!arguments.length) {
+            return value;
+        }
+        value = functor(arguments.length <= 0 ? undefined : arguments[0]);
+        return textLabel;
+    };
+
+    return textLabel;
+});
+
+
+
+//http://stackoverflow.com/questions/13101288/intersection-of-two-convex-polygons
+//http://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#JavaScript
+const intersectPolys = function(subjectPolygon, clipPolygon) {
+    let cp1, cp2, s, e,
+        inputList, outputList;
+
+    function inside(p) {
+        return (cp2[0]-cp1[0])*(p[1]-cp1[1]) > (cp2[1]-cp1[1])*(p[0]-cp1[0]);
+    }
+    function intersection() {
+        const dc = [ cp1[0] - cp2[0], cp1[1] - cp2[1] ],
+              dp = [ s[0] - e[0], s[1] - e[1] ],
+              n1 = cp1[0] * cp2[1] - cp1[1] * cp2[0],
+              n2 = s[0] * e[1] - s[1] * e[0], 
+              n3 = 1.0 / (dc[0] * dp[1] - dc[1] * dp[0]);
+        return [(n1*dp[0] - n2*dc[0]) * n3, (n1*dp[1] - n2*dc[1]) * n3];
+    }
+
+    outputList = subjectPolygon;
+    cp1 = clipPolygon[clipPolygon.length-1];
+
+    //for (j in clipPolygon) {
+    for(let j=0; j<clipPolygon.length; j++) {
+        cp2 = clipPolygon[j];
+        inputList = outputList;
+        outputList = [];
+        s = inputList[inputList.length - 1]; //last on the input list
+
+        //for (i in inputList) {
+        for(let i=0; i<inputList.length; i++) {
+            e = inputList[i];
+            if (inside(e)) {
+                if (!inside(s)) {
+                    outputList.push(intersection());
+                }
+                outputList.push(e);
+            }
+            else if (inside(s)) {
+                outputList.push(intersection());
+            }
+            s = e;
+        }
+        cp1 = cp2;
+    }
+    //return outputList;
+    
+    //http://stackoverflow.com/questions/16285134/calculating-polygon-area
+    function polygonArea(poly) {
+        if(!poly.length) { return 0; }
+
+        const len = poly.length;
+        let area = 0,
+            i = 0,
+            j = len-1;  // The last vertex is the 'previous' one to the first
+
+        for(; i < len; i++) {
+            area += (poly[j][0] + poly[i][0]) * (poly[j][1] - poly[i][1]);
+            j = i;  //j is previous vertex to i
+        }
+
+        return Math.abs(area/2);
+    }
+    return polygonArea(outputList);
+}
+
+const tracePolygon = function(rect) {
+    let poly = [
+        [rect.x,              rect.y],
+        [rect.x + rect.width, rect.y],
+        [rect.x + rect.width, rect.y + rect.height],
+        [rect.x,              rect.y + rect.height]
+    ];
+    
+    if(rect.angle) {
+        //The SVG label element is rotated clockwise around its top-left corner:
+        //http://stackoverflow.com/questions/17410809/how-to-calculate-rotation-in-2d-in-javascript
+        const cx = poly[0][0],
+              cy = poly[0][1],
+              radians = (Math.PI / 180) * -rect.angle,
+              cos = Math.cos(radians),
+              sin = Math.sin(radians);
+        
+        poly = poly.map(point => {
+            const x = point[0],
+                  y = point[1],
+                  nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
+                  ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+
+            return [nx, ny];
+        });
+    }
+    
+    return poly;
+}
+
+
+var isIntersecting = function isIntersecting(a, b) {
+    return !(a.x >= b.x + b.width || a.x + a.width <= b.x || a.y >= b.y + b.height || a.y + a.height <= b.y);
+};
+
+let _debugCounter = 0;
+var intersect = (function (a, b) {
+    _debugCounter++;
+    if((_debugCounter % 10000) === 0) {
+    	//console.log('intersect', _debugCounter, a, b);
+    }
+
+    if(a.angle || b.angle) {
+//*
+//DEBUG
+if((a.hidden !== undefined) || (b.hidden !== undefined)) {
+	debugger;
+    throw 'strat-fail!!';
+}
+//*/
+//console.log('inter', a, b);
+        a.__polygon = (a.__polygon || tracePolygon(a));
+        b.__polygon = (b.__polygon || tracePolygon(b));
+        return intersectPolys(a.__polygon, b.__polygon);
+    }
+    if (isIntersecting(a, b)) {
+        var left = Math.max(a.x, b.x);
+        var right = Math.min(a.x + a.width, b.x + b.width);
+        var top = Math.max(a.y, b.y);
+        var bottom = Math.min(a.y + a.height, b.y + b.height);
+        return (right - left) * (bottom - top);
+    } else {
+        return 0;
+    }
+});
+
+// computes the area of overlap between the rectangle with the given index with the
+// rectangles in the array
+var collisionArea = function collisionArea(rectangles, index) {
+    return d3Array.sum(rectangles.map(function (d, i) {
+        return index === i ? 0 : intersect(rectangles[index], d);
+    }));
+};
+
+// computes the total overlapping area of all of the rectangles in the given array
+
+var getPlacement = function getPlacement(x, y, width, height, angle, location) {
+    return {
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        angle: angle,
+        location: location
+    };
+};
+
+function parsePlacement(locationKey, origin, size) {
+    let x = origin.x,
+        y = origin.y,
+        distance = origin.radius || 0,
+        width = size.width,
+        height = size.height,
+    	angle = 0;
+    
+    const distOffset45deg = distance * .707  // x² + x² = 1²  =>  x = √.5
+
+    switch(locationKey) {
+    	case 'top-left': 		x -= width+distOffset45deg,  y -= height+distOffset45deg;
+    		break;
+    	case 'top-center': 		x -= width/2,                y -= height+distance;
+    		break;
+    	case 'top-right': 		x += distOffset45deg,        y -= height+distOffset45deg;
+    		break;
+
+        case 'clock-9':
+    	case 'middle-left': 	x -= width+distance, y -= height/2;
+    		break;
+    	case 'middle-center':	x -= width/2,        y -= height/2;
+    		break;
+        case 'clock-3':
+    	case 'middle-right': 	x += distance,       y -= height/2;
+    		break;
+    
+    	case 'bottom-left':		x -= width+distOffset45deg,  y += distOffset45deg;
+    		break;
+    	case 'bottom-center':	x -= width/2,                y += distance;
+    		break;
+    	case 'bottom-right':	x += distOffset45deg,        y += distOffset45deg;
+    		break;
+    
+    	case 'clock-1':
+    	case 'clock-2':
+    	//case 'clock-3':
+    	case 'clock-4':
+    	case 'clock-5':
+    	case 'clock-6':
+    	case 'clock-7':
+    	case 'clock-8':
+    	//case 'clock-9':
+    	case 'clock-10':
+    	case 'clock-11':
+    	case 'clock-12':
+            const deg2rad = Math.PI / 180;
+            
+    		angle = Number(locationKey.split('-')[1]) / 12 * 360;
+            angle = (angle - 90)%360;
+            
+            //Make clock-7 to clock-11 rigth-side-up instead of rotated upside-down:
+            if((angle > 90) && (angle < 270)) {
+                const angleRadCCW = -angle * deg2rad;
+                x += Math.cos(angleRadCCW) * (width + distance);
+                y -= Math.sin(angleRadCCW) * (width + distance);
+                
+                angle -= 180;
+            }
+            //Add distance to the "normal" ones - clock-12 to clock-6:
+            else if(distance) {
+                const angleRadCCW = -angle * deg2rad;
+                x += Math.cos(angleRadCCW) * distance;
+                y -= Math.sin(angleRadCCW) * distance;
+            }
+
+            //Nudge x and y (top-left corner) so the label is vertically centered on its data point:
+            const offsetLen = height / 2,
+                  offsetRadCCW = (-angle + 90) * deg2rad;
+            x += Math.cos(offsetRadCCW) * offsetLen;
+            y -= Math.sin(offsetRadCCW) * offsetLen;
+
+            break;
+
+    	default:
+    		throw 'Unknown label placement key: ' + locationKey;
+    }
+
+	return getPlacement(x, y, width, height, angle, locationKey);
+};
+
+// returns all the potential placements of the given label
+var placements = (function (label) {
+ 	let places = label.placements;
+
+ 	//Assign default placements if necessary:
+    if(!Array.isArray(places)) {
+        places = ['bottom-right', 'bottom-left', 'top-left', 'top-right', 'middle-right', 'bottom-center', 'middle-left', 'top-center'];
+        //places = ['clock-1', 'clock-2', 'clock-3', 'clock-4', 'clock-5', 'clock-6', 'clock-7', 'clock-8', 'clock-9', 'clock-10', 'clock-11', 'clock-12'];
+        //places = ['middle-center'];
+    }
+
+    //Calculate placement coordinates from location keys where necessary:
+    for(let i = 0, len = places.length; i < len; i++) {
+        if(typeof places[i] === 'string') {
+            places[i] = parsePlacement(places[i], { x: label.x, y: label.y }, { width: label.width, height: label.height });
+        }
+    }
+
+    //console.log('placements', JSON.stringify(places).replace(/(\.\d)\d+/g, '$1'));
+    return (label.placements = places);
+});
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+var substitute = function substitute(array, index, substitution) {
+    return [].concat(toConsumableArray(array.slice(0, index)), [substitution], toConsumableArray(array.slice(index + 1)));
+};
+
+var lessThan = function lessThan(a, b) {
+    return a < b;
+};
+
+// a layout takes an array of rectangles and allows their locations to be optimised.
+// it is constructed using two functions, locationScore, which score the placement of an
+// individual rectangle, and winningScore which takes the scores for a rectangle
+// at two different locations and assigns a winningScore.
+var layoutComponent = function layoutComponent() {
+    var score = null;
+
+    var winningScore = lessThan;
+
+    var locationScore = function locationScore() {
+        return 0;
+    };
+
+    var rectangles = void 0;
+
+    var evaluatePlacement = function evaluatePlacement(placement, index) {
+        return score - locationScore(rectangles[index], index, rectangles) + locationScore(placement, index, substitute(rectangles, index, placement));
+    };
+
+    var layout = function layout(placement, index) {
+        if (!score) {
+            score = d3Array.sum(rectangles.map(function (r, i) {
+                return locationScore(r, i, rectangles);
+            }));
+        }
+
+        var newScore = evaluatePlacement(placement, index);
+
+        if (winningScore(newScore, score)) {
+            return layoutComponent().locationScore(locationScore).winningScore(winningScore).score(newScore).rectangles(substitute(rectangles, index, placement));
+        } else {
+            return layout;
+        }
+    };
+
+    layout.rectangles = function () {
+        if (!arguments.length) {
+            return rectangles;
+        }
+        rectangles = arguments.length <= 0 ? undefined : arguments[0];
+        return layout;
+    };
+    layout.score = function () {
+        if (!arguments.length) {
+            return score;
+        }
+        score = arguments.length <= 0 ? undefined : arguments[0];
+        return layout;
+    };
+    layout.winningScore = function () {
+        if (!arguments.length) {
+            return winningScore;
+        }
+        winningScore = arguments.length <= 0 ? undefined : arguments[0];
+        return layout;
+    };
+    layout.locationScore = function () {
+        if (!arguments.length) {
+            return locationScore;
+        }
+        locationScore = arguments.length <= 0 ? undefined : arguments[0];
+        return layout;
+    };
+
+    return layout;
+};
+
+var greedy = (function () {
+
+    var bounds = void 0;
+
+    var containerPenalty = function containerPenalty(rectangle) {
+        return bounds ? rectangle.width * rectangle.height - intersect(rectangle, bounds) : 0;
+    };
+
+    var penaltyForRectangle = function penaltyForRectangle(rectangle, index, rectangles) {
+        return collisionArea(rectangles, index) + containerPenalty(rectangle);
+    };
+
+    var strategy = function strategy(data) {
+        const defaultPlacements = data.map(d => placements(d)[0]);
+        var rectangles = layoutComponent().locationScore(penaltyForRectangle).rectangles(defaultPlacements);
+
+        data.forEach(function (rectangle, index) {
+            placements(rectangle).forEach(function (placement, placementIndex) {
+//DEBUG
+//console.log('greedy r', placement);
+//if(placement.x === 450) debugger;
+        
+                rectangles = rectangles(placement, index);
+            });
+        });
+        var res = rectangles.rectangles();
+//DEBUG
+//console.log('greedy res', res);
+//var debug = res.filter(x => x.__polygon[0][0] === 450);
+//console.log('greedy deb', JSON.stringify(debug), debug);
+        return res;
+    };
+
+    strategy.bounds = function () {
+        if (!arguments.length) {
+            return bounds;
+        }
+        bounds = arguments.length <= 0 ? undefined : arguments[0];
+        return strategy;
+    };
+
+    return strategy;
+});
+
+var randomItem = function randomItem(array) {
+    return array[randomIndex(array)];
+};
+
+var randomIndex = function randomIndex(array) {
+    return Math.floor(Math.random() * array.length);
+};
+
+var annealing = (function () {
+
+    var temperature = 1000;
+    var cooling = 1;
+    var bounds = void 0;
+
+    var orientationPenalty = function orientationPenalty(rectangle) {
+        switch (rectangle.location) {
+            case 'bottom-right':
+                return 0;
+            case 'middle-right':
+            case 'bottom-center':
+                return rectangle.width * rectangle.height / 8;
+        }
+        return rectangle.width * rectangle.height / 4;
+    };
+
+    var containerPenalty = function containerPenalty(rectangle) {
+        return bounds ? rectangle.width * rectangle.height - intersect(rectangle, bounds) : 0;
+    };
+
+    var penaltyForRectangle = function penaltyForRectangle(rectangle, index, rectangles) {
+        return collisionArea(rectangles, index) + containerPenalty(rectangle) + orientationPenalty(rectangle);
+    };
+
+    var strategy = function strategy(data) {
+        var currentTemperature = temperature;
+
+        // use annealing to allow a new score to be picked even if it is worse than the old
+        var winningScore = function winningScore(newScore, oldScore) {
+            return Math.exp((oldScore - newScore) / currentTemperature) > Math.random();
+        };
+
+        const defaultPlacements = data.map(d => placements(d)[0]);
+        var rectangles = layoutComponent().locationScore(penaltyForRectangle).winningScore(winningScore).rectangles(defaultPlacements);
+
+        while (currentTemperature > 0) {
+            var index = randomIndex(data);
+            var randomNewPlacement = randomItem(placements(data[index]));
+            rectangles = rectangles(randomNewPlacement, index);
+            currentTemperature -= cooling;
+        }
+        return rectangles.rectangles();
+    };
+
+    strategy.temperature = function () {
+        if (!arguments.length) {
+            return temperature;
+        }
+        temperature = arguments.length <= 0 ? undefined : arguments[0];
+        return strategy;
+    };
+
+    strategy.cooling = function () {
+        if (!arguments.length) {
+            return cooling;
+        }
+        cooling = arguments.length <= 0 ? undefined : arguments[0];
+        return strategy;
+    };
+
+    strategy.bounds = function () {
+        if (!arguments.length) {
+            return bounds;
+        }
+        bounds = arguments.length <= 0 ? undefined : arguments[0];
+        return strategy;
+    };
+
+    return strategy;
+});
+
+var scanForObject = function scanForObject(array, comparator) {
+    return array[d3Array.scan(array, comparator)];
+};
+
+var removeOverlaps = (function (adaptedStrategy) {
+
+    adaptedStrategy = adaptedStrategy || function (x) {
+        return x;
+    };
+
+    var removeOverlaps = function removeOverlaps(layout) {
+        layout = adaptedStrategy(layout);
+
+        var _loop = function _loop() {
+            // find the collision area for all overlapping rectangles, hiding the one
+            // with the greatest overlap
+            var visible = layout.filter(function (d) {
+                return !d.hidden;
+            });
+            var collisions = visible.map(function (d, i) {
+                return [d, collisionArea(visible, i)];
+            });
+            var maximumCollision = scanForObject(collisions, function (a, b) {
+                return b[1] - a[1];
+            });
+            if (maximumCollision[1] > 0) {
+                maximumCollision[0].hidden = true;
+            } else {
+                return 'break';
+            }
+        };
+
+        while (true) {
+            var _ret = _loop();
+
+            if (_ret === 'break') break;
+        }
+        return layout;
+    };
+
+    d3fcRebind.rebindAll(removeOverlaps, adaptedStrategy);
+
+    return removeOverlaps;
+});
+
+var boundingBox = (function () {
+
+    var bounds = [0, 0];
+
+    var strategy = function strategy(data) {
+        return data.map(function (d, i) {
+            var tx = d.x;
+            var ty = d.y;
+            if (tx + d.width > bounds[0]) {
+                tx -= d.width;
+            }
+
+            if (ty + d.height > bounds[1]) {
+                ty -= d.height;
+            }
+            return { height: d.height, width: d.width, x: tx, y: ty };
+        });
+    };
+
+    strategy.bounds = function () {
+        if (!arguments.length) {
+            return bounds;
+        }
+        bounds = arguments.length <= 0 ? undefined : arguments[0];
+        return strategy;
+    };
+
+    return strategy;
+});
+
+exports.layoutLabel = label;
+exports.layoutTextLabel = textLabel;
+exports.layoutGreedy = greedy;
+exports.layoutAnnealing = annealing;
+exports.layoutRemoveOverlaps = removeOverlaps;
+exports.layoutBoundingBox = boundingBox;
+exports.parsePlacement = parsePlacement;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
+</script>
+
+
+  
+
+    <script  src="js/index.js"></script>
+
+
+
+
+</body>
+
 </html>

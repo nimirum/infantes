@@ -1,0 +1,47 @@
+body {
+    font-family: sans-serif;
+}
+
+svg {
+    border: 1px solid gainsboro;
+    
+    path {
+        fill: yellow;
+        opacity: .2;
+        pointer-events: none;
+    }
+
+    .bubble {
+        fill: red;
+        stroke: white;
+        stroke-width: 2;
+    }
+
+    g.label {
+        font-size: 14px;
+
+        &[data-dummy] {
+            display: none !important;
+            fill: blue;
+        }
+        /*
+        &[style="display:none"] {
+            display: inherit !important;
+            opacity: .4;
+        }
+        //*/
+
+        rect {
+            fill: rgba(blue, .1);
+            stroke: rgba(blue, .2);
+            fill: none; stroke: none;
+        }
+        circle {
+            display: none;
+            stroke: rgba(lime, .4);
+            stroke-width: 10px;
+            fill: none;
+        }
+    }
+
+}

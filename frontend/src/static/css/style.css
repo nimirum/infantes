@@ -1,0 +1,42 @@
+body {
+  font-family: sans-serif;
+}
+
+svg {
+  border: 1px solid gainsboro;
+}
+svg path {
+  fill: yellow;
+  opacity: .2;
+  pointer-events: none;
+}
+svg .bubble {
+  fill: red;
+  stroke: white;
+  stroke-width: 2;
+}
+svg g.label {
+  font-size: 14px;
+  /*
+  &[style="display:none"] {
+      display: inherit !important;
+      opacity: .4;
+  }
+  //*/
+}
+svg g.label[data-dummy] {
+  display: none !important;
+  fill: blue;
+}
+svg g.label rect {
+  fill: rgba(0, 0, 255, 0.1);
+  stroke: rgba(0, 0, 255, 0.2);
+  fill: none;
+  stroke: none;
+}
+svg g.label circle {
+  display: none;
+  stroke: rgba(0, 255, 0, 0.4);
+  stroke-width: 10px;
+  fill: none;
+}
