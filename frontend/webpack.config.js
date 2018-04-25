@@ -59,10 +59,10 @@ module.exports = {
         ],
       },
       {
-        test: /\.json$/,
+        test: /\.csv$/,
         use: [
           {
-            loader: 'json',
+            loader: 'file-loader',
           },
         ],
       },
