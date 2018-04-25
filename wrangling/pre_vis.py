@@ -15,14 +15,14 @@ def plot_test():
     print(df.head())
 
 
-    init_notebook_mode(connected=False)
+    #init_notebook_mode(connected=False)
     data = [go.Bar(
         y=df['syntvaki'],
         x=df['Alue'],
     )]
-    layout = go.Layout(title="Percentage of newborns per population")
-    fig = go.Figure(data=data, layout=layout)
-    offline.plot(fig)
+    #layout = go.Layout(title="Percentage of newborns per population")
+    #fig = go.Figure(data=data, layout=layout)
+    #offline.plot(fig)
     '''
     plot({
         "data": data,
@@ -50,13 +50,15 @@ def get_data():
     print(births15and16.head())
     return births15and16
 def get_kuntadata():
+    muncipilaties = pd.read_csv("../data/kunta_maakunta_yhteys.csv", encoding='utf8', sep='\t')
+
     keys = pd.read_csv("../data/kuntien_avainluvut_2000_2017.csv", encoding='utf8', sep=';')
     keys['Alue'] = keys['Alue 2017']
     keys = keys[(keys['Tiedot'] == 'Väkiluku') & (keys['Alue'] != 'KOKO MAA')][['2016', 'Alue']].reset_index()
-
+    keys = pd.merge(keys,muncipilaties[['Alue','maakunta']],on='Alue', how='left')
     print(keys.head())
     return keys
 
 if __name__ == "__main__":
     #get_kuntadata()
-    plot_test()
+ plot_test()
