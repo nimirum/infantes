@@ -1,18 +1,19 @@
 import './static/index.html'
 import './static/scss/index.scss'
 import * as d3 from "d3"
-import dataset from './data.csv'
+import data from '../../wrangling/births_with_population.json'
+console.log('json dataset', data)
 
 var margin = {top: 30, right: 50, bottom: 40, left:40};
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
 
-	var svg = d3.select('body')
-		.append('svg')
-		.attr('width', width + margin.left + margin.right)
-		.attr('height', height + margin.top + margin.bottom)
+var svg = d3.select('body')
+	.append('svg')
+	.attr('width', width + margin.left + margin.right)
+	.attr('height', height + margin.top + margin.bottom)
 	.append('g')
-		.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+	.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 
 	// The API for scales have changed in v4. There is a separate module d3-scale which can be used instead. The main change here is instead of d3.scale.linear, we have d3.scaleLinear.
@@ -36,113 +37,92 @@ var height = 500 - margin.top - margin.bottom;
 	// again scaleOrdinal
 	var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-	/*d3.csv(dataset).then(function(data, error){
-		console.log("Here!");
-		console.log("Columns are: ", data, error);
-	});*/
+	xScale.domain(d3.extent(data, function(d){
+		return d.Unemployment;
+	})).nice();
 
-	d3.csv(dataset).then(function(data, error){
-		console.log(data);
-		console.log(dataset);
-		if(error) throw error;
-		data.forEach(function(d,i){
-			 d.SepalLength = +d.SepalLength;
-			 d.SepalWidth = +d.SepalWidth;
-			 d.PetalLength = +d.PetalLength;
-			 d.Species = d.Name;
+	yScale.domain(d3.extent(data, function(d){
+		return d['Births population ratio'];
+	})).nice();
+
+	radius.domain(d3.extent(data, function(d){
+		return d.Population;
+	})).nice();
+
+	// adding axes is also simpler now, just translate x-axis to (0,height) and it's alread defined to be a bottom axis.
+	svg.append('g')
+		.attr('transform', 'translate(0,' + height + ')')
+		.attr('class', 'x axis')
+		.call(xAxis);
+
+	// y-axis is translated to (0,0)
+	svg.append('g')
+		.attr('transform', 'translate(0,0)')
+		.attr('class', 'y axis')
+		.call(yAxis);
+
+	var bubble = svg.selectAll('.bubble')
+		.data(data)
+		.enter().append('circle')
+		.attr('class', 'bubble')
+		.attr('cx', function(d){console.log(xScale(d));return xScale(d.Unemployment);})
+		.attr('cy', function(d){ return yScale(d['Births population ratio']); })
+		.attr('r', function(d){ return radius(d.Population); })
+		.style('fill', function(d){ return color(d.Region); });
+
+	bubble.append('title')
+		.attr('x', function(d){ return radius(d.Population); })
+		.text(function(d){
+			return d.Area;
 		});
 
-		xScale.domain(d3.extent(data, function(d){
-			return d.SepalLength;
-		})).nice();
-
-		yScale.domain(d3.extent(data, function(d){
-			return d.SepalWidth;
-		})).nice();
-
-		radius.domain(d3.extent(data, function(d){
-			return d.PetalLength;
-		})).nice();
-
-		// adding axes is also simpler now, just translate x-axis to (0,height) and it's alread defined to be a bottom axis. 
-		svg.append('g')
-			.attr('transform', 'translate(0,' + height + ')')
-			.attr('class', 'x axis')
-			.call(xAxis);
-
-		// y-axis is translated to (0,0)
-		svg.append('g')
-			.attr('transform', 'translate(0,0)')
-			.attr('class', 'y axis')
-			.call(yAxis);
+	// adding label. For x-axis, it's at (10, 10), and for y-axis at (width, height-10).
+	svg.append('text')
+		.attr('x', 10)
+		.attr('y', 10)
+		.attr('class', 'label')
+		.text('Birth ratio');
 
 
-		var bubble = svg.selectAll('.bubble')
-			.data(data)
-			.enter().append('circle')
-			.attr('class', 'bubble')
-			.attr('cx', function(d){return xScale(d.SepalLength);})
-			.attr('cy', function(d){ return yScale(d.SepalWidth); })
-			.attr('r', function(d){ return radius(d.PetalLength); })
-			.style('fill', function(d){ return color(d.Species); });
+	svg.append('text')
+		.attr('x', width)
+		.attr('y', height - 10)
+		.attr('text-anchor', 'end')
+		.attr('class', 'label')
+		.text('Unemployment');
 
-		bubble.append('title')
-			.attr('x', function(d){ return radius(d.PetalLength); })
-			.text(function(d){
-				return d.Species;
-			});
+	// I feel I understand legends much better now.
+	// define a group element for each color i, and translate it to (0, i * 20).
+	var legend = svg.selectAll('legend')
+		.data(color.domain())
+		.enter().append('g')
+		.attr('class', 'legend')
+		.attr('transform', function(d,i){ return 'translate(0,' + i * 20 + ')'; });
 
-		// adding label. For x-axis, it's at (10, 10), and for y-axis at (width, height-10).
-		svg.append('text')
-			.attr('x', 10)
-			.attr('y', 10)
-			.attr('class', 'label')
-			.text('Sepal Width');
+	// give x value equal to the legend elements.
+	// no need to define a function for fill, this is automatically fill by color.
+	legend.append('rect')
+		.attr('x', width)
+		.attr('width', 18)
+		.attr('height', 18)
+		.style('fill', color);
 
-
-		svg.append('text')
-			.attr('x', width)
-			.attr('y', height - 10)
-			.attr('text-anchor', 'end')
-			.attr('class', 'label')
-			.text('Sepal Length');
-
-		// I feel I understand legends much better now.
-		// define a group element for each color i, and translate it to (0, i * 20). 
-		var legend = svg.selectAll('legend')
-			.data(color.domain())
-			.enter().append('g')
-			.attr('class', 'legend')
-			.attr('transform', function(d,i){ return 'translate(0,' + i * 20 + ')'; });
-
-		// give x value equal to the legend elements. 
-		// no need to define a function for fill, this is automatically fill by color.
-		legend.append('rect')
-			.attr('x', width)
-			.attr('width', 18)
-			.attr('height', 18)
-			.style('fill', color);
-
-		// add text to the legend elements.
-		// rects are defined at x value equal to width, we define text at width - 6, this will print name of the legends before the rects.
-		legend.append('text')
-			.attr('x', width - 6)
-			.attr('y', 9)
-			.attr('dy', '.35em')
-			.style('text-anchor', 'end')
-			.text(function(d){ return d; });
+	// add text to the legend elements.
+	// rects are defined at x value equal to width, we define text at width - 6, this will print name of the legends before the rects.
+	legend.append('text')
+		.attr('x', width - 6)
+		.attr('y', 9)
+		.attr('dy', '.35em')
+		.style('text-anchor', 'end')
+		.text(function(d){ return d; });
 
 
-		// d3 has a filter fnction similar to filter function in JS. Here it is used to filter d3 components.
-		legend.on('click', function(type){
-			d3.selectAll('.bubble')
-				.style('opacity', 0.15)
-				.filter(function(d){
-					return d.Species == type;
-				})
-				.style('opacity', 1);
-		})
-
-
+	// d3 has a filter fnction similar to filter function in JS. Here it is used to filter d3 components.
+	legend.on('click', function(type){
+		d3.selectAll('.bubble')
+			.style('opacity', 0.15)
+			.filter(function(d){
+				return d.Species == type;
+			})
+			.style('opacity', 1);
 	})
-
