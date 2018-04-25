@@ -3,9 +3,6 @@ import './static/scss/index.scss'
 import * as d3 from "d3"
 import dataset from './data.csv'
 
-console.log('Webpack and webpack-dev-server works')
-
-/*var d3 = require("d3");*/
 var margin = {top: 30, right: 50, bottom: 40, left:40};
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
