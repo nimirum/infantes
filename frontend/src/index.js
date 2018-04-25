@@ -2,7 +2,6 @@ import './static/index.html'
 import './static/scss/index.scss'
 import * as d3 from "d3"
 import data from '../../wrangling/births_with_population.json'
-console.log('json dataset', data)
 
 var margin = {top: 30, right: 50, bottom: 40, left:40};
 var width = 960 - margin.left - margin.right;
@@ -25,7 +24,7 @@ var svg = d3.select('body')
 
 	// square root scale
 	var radius = d3.scaleSqrt()
-		.range([2,5]);
+		.range([2,10]);
 
 	// the axes are much cleaner and easier now. No need to rotate and orient the axis, just call axisBottom, axisLeft etc.
 	var xAxis = d3.axisBottom()
@@ -65,7 +64,7 @@ var svg = d3.select('body')
 		.data(data)
 		.enter().append('circle')
 		.attr('class', 'bubble')
-		.attr('cx', function(d){console.log(xScale(d));return xScale(d.Unemployment);})
+		.attr('cx', function(d){return xScale(d.Unemployment);})
 		.attr('cy', function(d){ return yScale(d['Births population ratio']); })
 		.attr('r', function(d){ return radius(d.Population); })
 		.style('fill', function(d){ return color(d.Region); });

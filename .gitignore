@@ -3,5 +3,5 @@
 .vscode/
 .idea/
 /test
-./wrangling/*.json
-./wrangling/*.html
+/wrangling/*.json
+/wrangling/*.html
