@@ -17,18 +17,22 @@ def plot_test():
     print(df.head())
     df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2016', 'change', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']]
     df2.columns = ['Area', 'Region', 'Births population ratio', 'Population', 'Births2016', 'Births change %', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']
-    df2.to_json('births_with_population.json', orient='records', force_ascii=False)
+    df2.to_json('births_with_population.json', orient='records', force_ascii=True)
     print(df2.head())
 
-    #init_notebook_mode(connected=False)
-    # data = [go.Bar(
-    #    y=df['syntvaki'],
-    #    x=df['Alue'],
-    # )]
+    init_notebook_mode(connected=False)
+    data = [go.Scatter(
+        y=df2['Births population ratio'],
+        x=df2['Unemployment'],
+        mode='markers',
+        marker=dict(
+            color='#FFBAD2'
+        )
+     )]
 
-    #layout = go.Layout(title="Percentage of newborns per population")
-    #fig = go.Figure(data=data, layout=layout)
-    #offline.plot(fig)
+    layout = go.Layout(title="Percentage of newborns per population")
+    fig = go.Figure(data=data, layout=layout)
+    offline.plot(fig)
     '''
     plot({
         "data": data,
