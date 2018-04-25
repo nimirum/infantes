@@ -60,6 +60,15 @@ var svg = d3.select('body')
 		.attr('class', 'y axis')
 		.call(yAxis);
 
+	//Draw a line at birth rate = 1
+	svg.append('rect')
+		.attr('x', 0)
+		.attr('y', yScale(1))
+		.attr('width', width)
+		.attr('height', 1)
+		.style('fill', '#c3c3c3')
+
+
 	var bubble = svg.selectAll('.bubble')
 		.data(data)
 		.enter().append('circle')
@@ -114,7 +123,6 @@ var svg = d3.select('body')
 		.attr('dy', '.35em')
 		.style('text-anchor', 'end')
 		.text(function(d){ return d; });
-
 
 	// d3 has a filter fnction similar to filter function in JS. Here it is used to filter d3 components.
 	legend.on('click', function(type){
