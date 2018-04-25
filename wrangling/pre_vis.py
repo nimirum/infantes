@@ -15,8 +15,8 @@ def plot_test():
     df['syntvaki'] = df['Births2016'] / df['Population'] * 100
     df = df.sort_values(by='syntvaki')
     print(df.head())
-    df2 = df[['Area', 'syntvaki', 'Population', 'Births2016', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']]
-    df2.columns = ['Area', 'Births population ratio', 'Population', 'Births', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']
+    df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2016', 'change', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']]
+    df2.columns = ['Area', 'Region', 'Births population ratio', 'Population', 'Births2016', 'Births change %', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']
     df2.to_json('births_with_population.json', orient='records', force_ascii=False)
     print(df2.head())
 
@@ -61,8 +61,12 @@ def get_data():
 
 def get_kuntadata():
     muncipilaties = pd.read_csv("../data/kunta_maakunta_yhteys.csv", encoding='utf8', sep='\t')
+    muncipilaties = muncipilaties[['Alue', 'maakunta']]
+    muncipilaties.columns = ['Area', 'Region']
+
+    print(muncipilaties.head())
     keys = pd.read_csv("../data/kuntien_avainluvut_2000_2017.csv", encoding='utf8', sep=';')
-    
+
     keys['Alue'] = keys['Alue 2017']
     keys1 = keys[((keys['Tiedot'] == ('Väkiluku')))
                 & (keys['Alue'] != 'KOKO MAA')][['2016', 'Alue']].reset_index()
@@ -88,7 +92,7 @@ def get_kuntadata():
     keys = pd.merge(right=keys, left=keys3, how='left', on='Area')
     keys = pd.merge(right=keys, left=keys4, how='left', on='Area')
     #print(keys.head())
-    keys = pd.merge(keys, muncipilaties[['Alue','maakunta']],on='Alue', how='left')
+    keys = pd.merge(keys, muncipilaties, on='Area', how='left')
     return keys
 
 
