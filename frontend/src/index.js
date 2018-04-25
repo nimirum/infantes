@@ -121,7 +121,7 @@ var svg = d3.select('body')
 		d3.selectAll('.bubble')
 			.style('opacity', 0.15)
 			.filter(function(d){
-				return d.Species == type;
+				return d.Region == type || type == null;
 			})
 			.style('opacity', 1);
 	})
