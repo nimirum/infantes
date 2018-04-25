@@ -25,6 +25,7 @@ def plot_test():
     #    y=df['syntvaki'],
     #    x=df['Alue'],
     # )]
+
     #layout = go.Layout(title="Percentage of newborns per population")
     #fig = go.Figure(data=data, layout=layout)
     #offline.plot(fig)
@@ -59,7 +60,9 @@ def get_data():
 
 
 def get_kuntadata():
+    muncipilaties = pd.read_csv("../data/kunta_maakunta_yhteys.csv", encoding='utf8', sep='\t')
     keys = pd.read_csv("../data/kuntien_avainluvut_2000_2017.csv", encoding='utf8', sep=';')
+    
     keys['Alue'] = keys['Alue 2017']
     keys1 = keys[((keys['Tiedot'] == ('Väkiluku')))
                 & (keys['Alue'] != 'KOKO MAA')][['2016', 'Alue']].reset_index()
@@ -85,9 +88,10 @@ def get_kuntadata():
     keys = pd.merge(right=keys, left=keys3, how='left', on='Area')
     keys = pd.merge(right=keys, left=keys4, how='left', on='Area')
     #print(keys.head())
+    keys = pd.merge(keys, muncipilaties[['Alue','maakunta']],on='Alue', how='left')
     return keys
 
 
 if __name__ == "__main__":
     #get_kuntadata()
-    plot_test()
+ plot_test()
