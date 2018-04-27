@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import './static/index.html'
 import './static/scss/index.scss'
 import data from '../../wrangling/births_with_population.json'
@@ -9,15 +11,24 @@ var height = 500 - margin.top - margin.bottom;
 
 let state = {
 	data,
+	yAttribute: 'BirthsPopulationRatio',
+	xAttribute: 'Unemployment',
+	xScale: null,
+	yScale: null,
+	radius: null,
+	color: null,
+	svg: null,
 }
-const base = scatterplot('body', margin, width, height)
-const { svg, xScale, yScale, radius, color } = base(state.data)
-renderBubbles(svg, state.data, 'BirthsPopulationRatio', 'Unemployment', xScale, yScale, radius, color)
 
-
+const initApp = () => {
+	const {svg, xScale, yScale, radius, color} = scatterplot('body', margin, width, height, state.data)
+	state = R.merge(state, {svg, xScale, yScale, radius, color})
+	renderBubbles(state)
+	console.log(state)
+}
 const updateState = (newState) => {
-	state = newState
-	renderBubbles(svg, state.data, 'BirthsPopulationRatio', 'Unemployment', xScale, yScale, radius, color)
+	state = R.merge(state, newState)
+	renderBubbles(state)
 }
 
 window.onButtonClick = (e) => {
@@ -25,3 +36,5 @@ window.onButtonClick = (e) => {
 	const data = state.data.slice(index)
 	updateState({data})
 }
+
+initApp()

@@ -1,8 +1,8 @@
 import * as d3 from "d3"
 
-const scatterplot = (svgElement, margin, width, height) => (data) => {
+const scatterplot = (targetHTML, margin, width, height, data) => {
 
-  var svg = d3.select(svgElement)
+  var svg = d3.select(targetHTML)
   	.append('svg')
   	.attr('width', width + margin.left + margin.right)
   	.attr('height', height + margin.top + margin.bottom)
@@ -116,7 +116,8 @@ const scatterplot = (svgElement, margin, width, height) => (data) => {
 
 }
 
-const renderBubbles = (svg, data, yAttribute, xAttribute, xScale, yScale, radius, color) => {
+const renderBubbles = (state) => {
+  const { svg, data, yAttribute, xAttribute, xScale, yScale, radius, color } = state
   var bubble = svg.selectAll('.bubble').data(data)
 
   bubble.enter().append('circle')
