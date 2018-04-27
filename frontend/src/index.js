@@ -21,7 +21,7 @@ let state = {
 }
 
 const initApp = () => {
-	const {svg, xScale, yScale, radius, color} = scatterplot('body', margin, width, height, state.data)
+	const {svg, xScale, yScale, radius, color} = scatterplot('body', margin, width, height, state)
 	state = R.merge(state, {svg, xScale, yScale, radius, color})
 	renderBubbles(state)
 	console.log(state)

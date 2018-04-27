@@ -1,6 +1,7 @@
 import * as d3 from "d3"
 
-const scatterplot = (targetHTML, margin, width, height, data) => {
+const scatterplot = (targetHTML, margin, width, height, state) => {
+  const { data } = state
 
   var svg = d3.select(targetHTML)
   	.append('svg')
