@@ -2,25 +2,22 @@ import * as d3 from "d3"
 
 const scales = (state, width, height) => {
   const { data, xAttribute, yAttribute, radiusAttribute } = state;
-  // The API for scales have changed in v4. There is a separate module d3-scale which can be used instead. The main change here is instead of d3.scale.linear, we have d3.scaleLinear.
+
   var xScale = d3.scaleLinear()
     .range([0, width]);
 
   var yScale = d3.scaleLinear()
     .range([height, 0]);
 
-  // square root scale
   var radius = d3.scaleSqrt()
     .range([2,10]);
 
-  // the axes are much cleaner and easier now. No need to rotate and orient the axis, just call axisBottom, axisLeft etc.
   var xAxis = d3.axisBottom()
     .scale(xScale);
 
   var yAxis = d3.axisLeft()
     .scale(yScale);
 
-  // again scaleOrdinal
   var color = d3.scaleOrdinal(d3.schemeCategory10);
 
   xScale.domain(d3.extent(data, function(d){
@@ -49,19 +46,16 @@ const base = (targetHTML, margin, width, height, state, attributesToString) => {
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  // adding axes is also simpler now, just translate x-axis to (0,height) and it's alread defined to be a bottom axis.
   svg.append('g')
   	.attr('transform', 'translate(0,' + height + ')')
   	.attr('class', 'x axis')
   	.call(xAxis);
 
-  // y-axis is translated to (0,0)
   svg.append('g')
   	.attr('transform', 'translate(0,0)')
   	.attr('class', 'y axis')
   	.call(yAxis);
 
-  //Draw a line at birth rate = 1
   svg.append('rect')
   	.attr('x', 0)
   	.attr('y', yScale(1))
@@ -115,16 +109,12 @@ const renderLegend = (state, width) => {
     .attr('class', 'legend')
     .attr('transform', function(d,i){ return 'translate(0,' + i * 20 + ')'; });
 
-  // give x value equal to the legend elements.
-  // no need to define a function for fill, this is automatically fill by color.
   legend.append('rect')
     .attr('x', width)
     .attr('width', 18)
     .attr('height', 18)
     .style('fill', color);
 
-  // add text to the legend elements.
-  // rects are defined at x value equal to width, we define text at width - 6, this will print name of the legends before the rects.
   legend.append('text')
     .attr('x', width - 6)
     .attr('y', 9)
@@ -132,7 +122,6 @@ const renderLegend = (state, width) => {
     .style('text-anchor', 'end')
     .text(function(d){ return d; });
 
-  // d3 has a filter fnction similar to filter function in JS. Here it is used to filter d3 components.
   legend.on('click', function(type){
     d3.selectAll('.bubble')
       .style('opacity', 0.15)
