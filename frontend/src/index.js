@@ -23,11 +23,17 @@ let state = {
 	svg: null,
 }
 
+const attributesToString = {
+	'BirthsPopulationRatio': 'Births to population',
+	'Unemployment': 'Unemployment',
+	'Population': 'Population',
+}
+
 const initApp = () => {
 	const scales = Scatterplot.scales(state, width, height)
 	state = R.merge(state, scales)
 	console.log(state)
-	const svg = Scatterplot.base('body', margin, width, height, state)
+	const svg = Scatterplot.base('body', margin, width, height, state, attributesToString)
 	state = R.merge(state, {svg})
 	Scatterplot.renderBubbles(state)
 	Scatterplot.renderLegend(state, width)

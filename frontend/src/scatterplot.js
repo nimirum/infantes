@@ -39,8 +39,8 @@ const scales = (state, width, height) => {
 
 }
 
-const base = (targetHTML, margin, width, height, state) => {
-  const { data, xAxis, yAxis, xScale, yScale, color } = state
+const base = (targetHTML, margin, width, height, state, attributesToString) => {
+  const { data, xAxis, yAxis, xScale, yScale, color, xAttribute, yAttribute } = state
 
   var svg = d3.select(targetHTML)
     .append('svg')
@@ -69,20 +69,18 @@ const base = (targetHTML, margin, width, height, state) => {
   	.attr('height', 1)
   	.style('fill', '#c3c3c3')
 
-  // adding label. For x-axis, it's at (10, 10), and for y-axis at (width, height-10).
   svg.append('text')
-  	.attr('x', 10)
-  	.attr('y', 10)
-  	.attr('class', 'label')
-  	.text('Birth ratio');
-
+    .attr('x', 10)
+    .attr('y', 10)
+    .attr('class', 'label')
+    .text(attributesToString[yAttribute]);
 
   svg.append('text')
-  	.attr('x', width)
-  	.attr('y', height - 10)
-  	.attr('text-anchor', 'end')
-  	.attr('class', 'label')
-  	.text('Unemployment');
+    .attr('x', width)
+    .attr('y', height - 10)
+    .attr('text-anchor', 'end')
+    .attr('class', 'label')
+    .text(attributesToString[xAttribute]);
 
   return svg
 
