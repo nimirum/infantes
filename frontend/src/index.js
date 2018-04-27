@@ -41,7 +41,7 @@ var svg = d3.select('body')
 	})).nice();
 
 	yScale.domain(d3.extent(data, function(d){
-		return d['Births population ratio'];
+		return d.BirthsPopulationRatio;
 	})).nice();
 
 	radius.domain(d3.extent(data, function(d){
@@ -74,7 +74,7 @@ var svg = d3.select('body')
 		.enter().append('circle')
 		.attr('class', 'bubble')
 		.attr('cx', function(d){return xScale(d.Unemployment);})
-		.attr('cy', function(d){ return yScale(d['Births population ratio']); })
+		.attr('cy', function(d){return yScale(d.BirthsPopulationRatio); })
 		.attr('r', function(d){ return radius(d.Population); })
 		.style('fill', function(d){ return color(d.Region); });
 
