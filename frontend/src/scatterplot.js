@@ -84,8 +84,33 @@ const base = (targetHTML, margin, width, height, state) => {
   	.attr('class', 'label')
   	.text('Unemployment');
 
-  // I feel I understand legends much better now.
-  // define a group element for each color i, and translate it to (0, i * 20).
+  return svg
+
+}
+
+const renderBubbles = (state) => {
+  const { svg, data, yAttribute, xAttribute, xScale, yScale, radius, color } = state
+  var bubble = svg.selectAll('.bubble').data(data)
+
+  bubble.enter().append('circle')
+    .attr('class', 'bubble')
+    .attr('cx', function(d){return xScale(d[xAttribute]);})
+    .attr('cy', function(d){return yScale(d[yAttribute]); })
+    .attr('r', function(d){ return radius(d.Population); })
+    .style('fill', function(d){ return color(d.Region); });
+
+  bubble.exit().remove();
+
+  bubble.append('title')
+    .attr('x', function(d){ return radius(d.Population); })
+    .text(function(d){
+      return d.Area;
+    });
+}
+
+const renderLegend = (state, width) => {
+  const { svg, data, color } = state
+
   var legend = svg.selectAll('legend')
     .data(color.domain())
     .enter().append('g')
@@ -118,29 +143,6 @@ const base = (targetHTML, margin, width, height, state) => {
       })
       .style('opacity', 1);
   })
-
-  return svg
-
 }
 
-const renderBubbles = (state) => {
-  const { svg, data, yAttribute, xAttribute, xScale, yScale, radius, color } = state
-  var bubble = svg.selectAll('.bubble').data(data)
-
-  bubble.enter().append('circle')
-    .attr('class', 'bubble')
-    .attr('cx', function(d){return xScale(d[xAttribute]);})
-    .attr('cy', function(d){return yScale(d[yAttribute]); })
-    .attr('r', function(d){ return radius(d.Population); })
-    .style('fill', function(d){ return color(d.Region); });
-
-  bubble.exit().remove();
-
-  bubble.append('title')
-    .attr('x', function(d){ return radius(d.Population); })
-    .text(function(d){
-      return d.Area;
-    });
-}
-
-export {base, renderBubbles, scales};
+export { base, renderBubbles, scales, renderLegend };

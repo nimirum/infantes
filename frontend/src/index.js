@@ -30,6 +30,7 @@ const initApp = () => {
 	const svg = Scatterplot.base('body', margin, width, height, state)
 	state = R.merge(state, {svg})
 	Scatterplot.renderBubbles(state)
+	Scatterplot.renderLegend(state, width)
 	console.log(state)
 }
 const updateState = (newState) => {
