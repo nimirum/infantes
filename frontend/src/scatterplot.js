@@ -1,47 +1,53 @@
 import * as d3 from "d3"
 
-const scatterplot = (targetHTML, margin, width, height, state) => {
-  const { data } = state
-
-  var svg = d3.select(targetHTML)
-  	.append('svg')
-  	.attr('width', width + margin.left + margin.right)
-  	.attr('height', height + margin.top + margin.bottom)
-  	.append('g')
-  	.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
+const scales = (state, width, height) => {
+  const { data, xAttribute, yAttribute, radiusAttribute } = state;
   // The API for scales have changed in v4. There is a separate module d3-scale which can be used instead. The main change here is instead of d3.scale.linear, we have d3.scaleLinear.
   var xScale = d3.scaleLinear()
-  	.range([0, width]);
+    .range([0, width]);
 
   var yScale = d3.scaleLinear()
-  	.range([height, 0]);
+    .range([height, 0]);
 
   // square root scale
   var radius = d3.scaleSqrt()
-  	.range([2,10]);
+    .range([2,10]);
 
   // the axes are much cleaner and easier now. No need to rotate and orient the axis, just call axisBottom, axisLeft etc.
   var xAxis = d3.axisBottom()
-  	.scale(xScale);
+    .scale(xScale);
 
   var yAxis = d3.axisLeft()
-  	.scale(yScale);
+    .scale(yScale);
 
   // again scaleOrdinal
   var color = d3.scaleOrdinal(d3.schemeCategory10);
 
   xScale.domain(d3.extent(data, function(d){
-  	return d.Unemployment;
+    return d[xAttribute];
   })).nice();
 
   yScale.domain(d3.extent(data, function(d){
-  	return d.BirthsPopulationRatio;
+    return d[yAttribute];
   })).nice();
 
   radius.domain(d3.extent(data, function(d){
-  	return d.Population;
+    return d[radiusAttribute];
   })).nice();
+
+  return { xScale, yScale, xAxis, yAxis, radius, color }
+
+}
+
+const base = (targetHTML, margin, width, height, state) => {
+  const { data, xAxis, yAxis, xScale, yScale, color } = state
+
+  var svg = d3.select(targetHTML)
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   // adding axes is also simpler now, just translate x-axis to (0,height) and it's alread defined to be a bottom axis.
   svg.append('g')
@@ -113,7 +119,7 @@ const scatterplot = (targetHTML, margin, width, height, state) => {
       .style('opacity', 1);
   })
 
-  return { svg, xScale, yScale, radius, color }
+  return svg
 
 }
 
@@ -137,4 +143,4 @@ const renderBubbles = (state) => {
     });
 }
 
-export {scatterplot, renderBubbles};
+export {base, renderBubbles, scales};
