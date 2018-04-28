@@ -89,15 +89,14 @@ const renderBubbles = (state) => {
     .attr('cx', function(d){return xScale(d[xAttribute]);})
     .attr('cy', function(d){return yScale(d[yAttribute]); })
     .attr('r', function(d){ return radius(d.Population); })
-    .style('fill', function(d){ return color(d.Region); });
+    .style('fill', function(d){ return color(d.Region); })
+    .append('title')
+      .attr('x', function(d){ return radius(d.Population); })
+      .text(function(d){
+        return d.Area;
+      });
 
   bubble.exit().remove();
-
-  bubble.append('title')
-    .attr('x', function(d){ return radius(d.Population); })
-    .text(function(d){
-      return d.Area;
-    });
 }
 
 const renderLegend = (state, width) => {
