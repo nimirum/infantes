@@ -6,18 +6,16 @@ from plotly.graph_objs import Layout
 import numpy as np
 
 
-def plot_test():
+def get_json_births_data():
     df = get_data()
     df = df[df['Area'] != 'KOKO MAA']
     municipalities = get_kuntadata()
     df = pd.merge(right=municipalities, left=df, how='left', on='Area')
-   # print(df.head())
 
-    df['syntvaki'] = df['Births2016'] / df['Population'] * 100
+    df['syntvaki'] = df['Births2017'] / df['Population'] * 100
     df = df.sort_values(by='syntvaki')
-    #print(df.head())
-    df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2016', 'change', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']]
-    df2.columns = ['Area', 'Region', 'BirthsPopulationRatio', 'Population', 'Births2016', 'BirthsChange%', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']
+    df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2015', 'Births2016', 'Births2017', 'change', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']]
+    df2.columns = ['Area', 'Region', 'BirthsPopulationRatio', 'Population', 'Births2015', 'Births2016', 'Births2017', 'BirthsChange%', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']
     df2.fillna(0, inplace=True)
     df2.replace(-np.inf, 0, inplace=True)
     df2.to_json('births_with_population.json', orient='records', force_ascii=True)
@@ -41,32 +39,27 @@ def plot_test():
         "layout": Layout(title="Testplot")
     }, image='png', image_filename="testplot")
     '''
-    print(df2['BirthsChange%'].unique())
 
 
 def get_data():
-    #fertility_rate = pd.read_csv("../data/kokonaishedelmallisyys_2000_2016.csv", encoding='utf8', sep=';')
-    births = pd.read_csv("../data/syntyneet_lapset_1987_2016.csv", encoding='utf8', sep=';')
+    births = pd.read_csv("../data/syntyneet_lapset_2000_2017.csv", encoding='utf8', sep=';')
 
+    births2017col = '2017 Sukupuolet yhteensä Elävänä syntyneet, lkm'
     births2016col = '2016 Sukupuolet yhteensä Elävänä syntyneet, lkm'
     births2015col = '2015 Sukupuolet yhteensä Elävänä syntyneet, lkm'
-    births = births.loc[births['Äidin ikä'] == "Ikäluokat yhteensä"]
-    births15and16 = births[['Alue', births2015col, births2016col]]
-    births15and16 = births15and16.reset_index()
+    births = births[['Alue', births2015col, births2016col, births2017col]]
+    births = births.reset_index()
 
-    #print(births15and16.head())
+    births['change'] = ((births[births2017col] - births[births2016col]) / births[
+        births2017col]) * 100
+    births['change'].round(2)
+    births = births.sort_values(['change'], ascending=True)
+    births.columns = ['index', 'Area', 'Births2015', 'Births2016', 'Births2017', 'change']
+    del births['index']
+    births['Area'].replace('Maarianhamina - Mariehamn', 'Maarianhamina', inplace=True)
 
-    births15and16['change'] = ((births15and16[births2016col] - births15and16[births2015col]) / births15and16[
-        births2016col]) * 100
-    births15and16['change'].round(2)
-    births15and16 = births15and16.sort_values(['change'], ascending=True)
-    births15and16.columns = ['index', 'Area', 'Births2015', 'Births2016', 'change']
-    del births15and16['index']
-
-    births15and16['Area'].replace('Maarianhamina - Mariehamn', 'Maarianhamina', inplace=True)
-
-    print(births15and16.head())
-    return births15and16
+    #print(births.head())
+    return births
 
 
 def get_kuntadata():
@@ -74,9 +67,7 @@ def get_kuntadata():
     muncipilaties = muncipilaties[['Alue', 'maakunta']]
     muncipilaties.columns = ['Area', 'Region']
 
-    print(muncipilaties.head())
     keys = pd.read_csv("../data/kuntien_avainluvut_2000_2017.csv", encoding='utf8', sep=';')
-
     keys['Alue'] = keys['Alue 2017']
     keys1 = keys[((keys['Tiedot'] == ('Väkiluku')))
                 & (keys['Alue'] != 'KOKO MAA')][['2016', 'Alue']].reset_index()
@@ -108,4 +99,4 @@ def get_kuntadata():
 
 if __name__ == "__main__":
     #get_kuntadata()
- plot_test()
+    get_json_births_data()
