@@ -1,0 +1,16 @@
+@import './fonts';
+@import './colors';
+
+body {
+	margin: 0;
+	font-family: $serif;
+  background-color: $white;
+}
+
+h1 {
+	font-family: $cursive;
+}
+
+p {
+  margin: 0 10vw;
+}

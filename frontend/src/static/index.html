@@ -1,17 +1,40 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <link href="https://fonts.googleapis.com/css?family=Average|Fjalla+One" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Dancing+Script|EB+Garamond" rel="stylesheet">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
-
-        <link href='app.css' rel='stylesheet' type='text/css'>
         <title>Infantes</title>
         <meta description="A visualization of Finnish munincipalities' birth rate" />
     </head>
     <body>
-        <!-- <div id="root" class="container-fluid">Hello world</div> -->
+      <div class="container-fluid">
+        <div class="row" id="masthead">
+          <div class="col">
+            <h1 id="page-title">Infantes</h1>
+            <p id="masthead-subtitle">
+              Visualizing birth rates in Finland
+            </p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row">
+            <p>
+              Our goal is to provide insights into the discussion surrounding the birth rates in Finland.
+              We do this by providing a visualization tool to enable deeper insights into the data.
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <!-- this will be taken over by d3 -->
+            <div id="visualization">
+            </div>
+          </div>
+        </div>
         <button onCLick="onButtonClick()">Push me!</button>
-        <script type="text/javascript" src="app.bundle.js" charset="utf-8"></script>
+      </div>
+      <script type="text/javascript" src="app.bundle.js" charset="utf-8"></script>
+
     </body>
 </html>
