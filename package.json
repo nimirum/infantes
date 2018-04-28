@@ -1,0 +1,7 @@
+{
+  "name": "Infantes",
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "make compile-frontend"
+  }
+}
