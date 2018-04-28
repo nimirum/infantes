@@ -14,8 +14,10 @@ def get_json_births_data():
 
     df['syntvaki'] = df['Births2017'] / df['Population'] * 100
     df = df.sort_values(by='syntvaki')
-    df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2015', 'Births2016', 'Births2017', 'change', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']]
-    df2.columns = ['Area', 'Region', 'BirthsPopulationRatio', 'Population', 'Births2015', 'Births2016', 'Births2017', 'BirthsChange%', 'Unemployment', 'UniversityDegree', 'BirthDeathSum']
+    df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2015', 'Births2016', 'Births2017',
+              'change', 'Unemployment', 'MenUnemployed2016', 'WomenUnemployed2016', 'UniversityDegree', 'BirthDeathSum']]
+    df2.columns = ['Area', 'Region', 'BirthsPopulationRatio', 'Population', 'Births2015', 'Births2016', 'Births2017',
+                   'BirthsChange%', 'Unemployment', 'MenUnemployed2016', 'WomenUnemployed2016', 'UniversityDegree', 'BirthDeathSum']
     df2.fillna(0, inplace=True)
     df2.replace(-np.inf, 0, inplace=True)
     df2.to_json('births_with_population.json', orient='records', force_ascii=True)
@@ -66,6 +68,18 @@ def get_kuntadata():
     muncipilaties = pd.read_csv("../data/kunta_maakunta_yhteys.csv", encoding='utf8', sep='\t')
     muncipilaties = muncipilaties[['Alue', 'maakunta']]
     muncipilaties.columns = ['Area', 'Region']
+
+    unemployment = pd.read_csv("../data/tyottomat_2016.csv", encoding='utf8', sep=';')
+    unemployment = unemployment[['Alue', 'Miehet Ikäluokat yhteensä 2016', 'Naiset Ikäluokat yhteensä 2016']]
+    unemployment.columns = ['Area', 'MenUnemployed2016', 'WomenUnemployed2016']
+
+    workforce = pd.read_csv("../data/tyovoima_2016.csv", encoding='utf8', sep=';')
+    workforce = workforce[['Alue', 'Miehet Ikäluokat yhteensä 2016', 'Naiset Ikäluokat yhteensä 2016']]
+    workforce.columns = ['Area', 'MenWorkForce2016', 'WomenWorkForce2016']
+    unemployment['MenUnemployed2016'] = (unemployment['MenUnemployed2016'] / workforce['MenWorkForce2016']) * 100
+    unemployment['WomenUnemployed2016'] = (unemployment['WomenUnemployed2016'] / workforce['WomenWorkForce2016']) * 100
+    muncipilaties = pd.merge(right=muncipilaties, left=unemployment, how='left', on='Area')
+    #print(muncipilaties.head())
 
     keys = pd.read_csv("../data/kuntien_avainluvut_2000_2017.csv", encoding='utf8', sep=';')
     keys['Alue'] = keys['Alue 2017']
