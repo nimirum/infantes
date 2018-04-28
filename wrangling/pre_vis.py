@@ -12,12 +12,10 @@ def get_json_births_data():
     municipalities = get_kuntadata()
     df = pd.merge(right=municipalities, left=df, how='left', on='Area')
 
-    df['syntvaki'] = df['Births2017'] / df['Population'] * 100
-    df = df.sort_values(by='syntvaki')
-    df2 = df[['Area', 'Region', 'syntvaki', 'Population', 'Births2015', 'Births2016', 'Births2017',
-              'change', 'Unemployment', 'MenUnemployed2016', 'WomenUnemployed2016', 'UniversityDegree', 'BirthDeathSum']]
-    df2.columns = ['Area', 'Region', 'BirthsPopulationRatio', 'Population', 'Births2015', 'Births2016', 'Births2017',
-                   'BirthsChange%', 'Unemployment', 'MenUnemployed2016', 'WomenUnemployed2016', 'UniversityDegree', 'BirthDeathSum']
+    df['BirthsPopulationRatio'] = df['Births2017'] / df['Population'] * 100
+    df = df.sort_values(by='BirthsPopulationRatio')
+    df2 = df[['Area', 'Region', 'BirthsPopulationRatio', 'Population', 'Births2015', 'Births2016', 'Births2017',
+              'BirthsChange%', 'Unemployment', 'MenUnemployed2016', 'WomenUnemployed2016', 'UniversityDegree', 'BirthDeathSum']]
     df2.fillna(0, inplace=True)
     df2.replace(-np.inf, 0, inplace=True)
     df2.to_json('births_with_population.json', orient='records', force_ascii=True)
@@ -45,18 +43,17 @@ def get_json_births_data():
 
 def get_data():
     births = pd.read_csv("../data/syntyneet_lapset_2000_2017.csv", encoding='utf8', sep=';')
-
     births2017col = '2017 Sukupuolet yhteensä Elävänä syntyneet, lkm'
     births2016col = '2016 Sukupuolet yhteensä Elävänä syntyneet, lkm'
     births2015col = '2015 Sukupuolet yhteensä Elävänä syntyneet, lkm'
     births = births[['Alue', births2015col, births2016col, births2017col]]
     births = births.reset_index()
 
-    births['change'] = ((births[births2017col] - births[births2016col]) / births[
+    births['BirthsChange%'] = ((births[births2017col] - births[births2016col]) / births[
         births2017col]) * 100
-    births['change'].round(2)
-    births = births.sort_values(['change'], ascending=True)
-    births.columns = ['index', 'Area', 'Births2015', 'Births2016', 'Births2017', 'change']
+    births['BirthsChange%'].round(2)
+    births = births.sort_values(['BirthsChange%'], ascending=True)
+    births.columns = ['index', 'Area', 'Births2015', 'Births2016', 'Births2017', 'BirthsChange%']
     del births['index']
     births['Area'].replace('Maarianhamina - Mariehamn', 'Maarianhamina', inplace=True)
 
