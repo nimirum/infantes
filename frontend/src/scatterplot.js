@@ -36,7 +36,7 @@ const scales = (state, width, height) => {
 
 }
 
-const base = (targetHTML, margin, width, height, state, attributesToString) => {
+const renderBase = (targetHTML, margin, width, height, state, attributesToString) => {
   const { data, xAxis, yAxis, xScale, yScale, color, xAttribute, yAttribute } = state
 
   var svg = d3.select(targetHTML)
@@ -132,4 +132,4 @@ const renderLegend = (state, width) => {
   })
 }
 
-export { base, renderBubbles, scales, renderLegend };
+export { renderBase, renderBubbles, scales, renderLegend };
