@@ -9,6 +9,8 @@ import * as Select from './select'
 var margin = {top: 30, right: 50, bottom: 40, left: 40};
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
+var xAttr = 'BirthsPopulationRatio';
+var yAttr = 'Unemployment';
 
 let state = {
 	data,
@@ -31,6 +33,8 @@ const attributesToString = {
 }
 
 const initApp = () => {
+	Select.renderSelect(setAttributeValues)
+	console.log(state)
 	const scales = Scatterplot.scales(state, width, height)
 	state = R.merge(state, scales)
 	console.log(state)
@@ -40,7 +44,7 @@ const initApp = () => {
 	Scatterplot.renderLegend(state, width)
 	console.log(state)
 
-	Select.renderSelect()
+	
 }
 const updateState = (newState) => {
 	state = R.merge(state, newState)
@@ -52,5 +56,19 @@ window.onButtonClick = (e) => {
 	const data = state.data.slice(index)
 	updateState({data})
 }
+
+const setAttributeValues = () => {
+	const xAxis = document.getElementById("xAxisSelect") 
+	const yAxis = document.getElementById("yAxisSelect")
+
+	var values = {
+		'xAttribute': xAxis.options[xAxis.selectedIndex].value,
+		'yAttribute': yAxis.options[yAxis.selectedIndex].value
+	}
+
+	state = R.merge(state, values)
+	console.log(state)
+}
+
 
 initApp()

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import pandas as pd
 from plotly.offline import init_notebook_mode, plot
 import plotly.graph_objs as go
