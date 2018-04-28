@@ -1,8 +1,8 @@
 import pandas as pd
-from plotly.offline import init_notebook_mode, plot
-import plotly.graph_objs as go
-import plotly.offline as offline
-from plotly.graph_objs import Layout
+# from plotly.offline import init_notebook_mode, plot
+# import plotly.graph_objs as go
+# import plotly.offline as offline
+# from plotly.graph_objs import Layout
 import numpy as np
 
 
