@@ -4,6 +4,7 @@ import './static/index.html'
 import './static/scss/index.scss'
 import data from '../../wrangling/births_with_population.json'
 import * as Scatterplot from './scatterplot'
+import * as Select from './select'
 
 var margin = {top: 30, right: 50, bottom: 40, left: 40};
 var width = 960 - margin.left - margin.right;
@@ -38,6 +39,8 @@ const initApp = () => {
 	Scatterplot.renderBubbles(state)
 	Scatterplot.renderLegend(state, width)
 	console.log(state)
+
+	Select.renderSelect()
 }
 const updateState = (newState) => {
 	state = R.merge(state, newState)
