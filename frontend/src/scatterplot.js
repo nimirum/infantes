@@ -9,7 +9,7 @@ const scales = (state, width, height) => {
   var yScale = d3.scaleLinear()
     .range([height, 0]);
 
-  var radius = d3.scaleSqrt()
+  var radius = d3.scaleLinear()
     .range([2,10]);
 
   var xAxis = d3.axisBottom()
@@ -47,9 +47,9 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   svg.append('g')
-  	.attr('transform', 'translate(0,' + height + ')')
-  	.attr('class', 'x axis')
-  	.call(xAxis);
+    .attr('transform', 'translate(0,' + height + ')')
+    .attr('class', 'x-axis')
+    .call(xAxis);
 
   svg.append('g')
   	.attr('transform', 'translate(0,0)')
@@ -67,6 +67,7 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
     .attr('x', 10)
     .attr('y', 10)
     .attr('class', 'label')
+    .attr('id', 'y-label')
     .text(attributesToString[yAttribute]);
 
   svg.append('text')
@@ -74,10 +75,28 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
     .attr('y', height - 10)
     .attr('text-anchor', 'end')
     .attr('class', 'label')
+    .attr('id', 'x-label')
     .text(attributesToString[xAttribute]);
 
   return svg
 
+}
+const redrawXAxis = (state, attributesToString) => {
+  const { xAttribute, data, xScale, svg, xAxis } = state
+  svg.selectAll('.x-axis').call(xAxis)
+  svg.selectAll('#x-label').text(attributesToString[xAttribute])
+  svg.selectAll('.bubble')
+    .transition()
+    .duration(1000)
+    .attr('cx', (d) => xScale(d[xAttribute]))
+}
+
+const updateXdim = (state, newXAttr, attributesToString) => {
+  const { xScale, data } = state
+  xScale.domain(d3.extent(data, function(d){
+    return d[newXAttr];
+  })).nice();
+  return d3.axisBottom().scale(xScale);
 }
 
 const renderBubbles = (state) => {
@@ -131,4 +150,4 @@ const renderLegend = (state, width) => {
   })
 }
 
-export { renderBase, renderBubbles, scales, renderLegend };
+export { renderBase, renderBubbles, scales, renderLegend, updateXdim, redrawXAxis };
