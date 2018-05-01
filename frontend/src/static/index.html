@@ -8,7 +8,7 @@
         <meta description="A visualization of Finnish munincipalities' birth rate" />
     </head>
     <body>
-      <div class="container-fluid">
+      <div class="container-fluid" id="page-container">
         <div class="row" id="masthead">
           <div class="col">
             <h1 id="page-title">Infantes</h1>
@@ -17,8 +17,8 @@
             </p>
           </div>
         </div>
-        <div class="col">
-          <div class="row">
+        <div class="row">
+          <div class="col">
             <p>
               Our goal is to provide insights into the discussion surrounding the birth rates in Finland.
               We do this by providing a visualization tool to enable deeper insights into the data.
@@ -30,13 +30,19 @@
             <!-- this will be taken over by d3 -->
             <div id="visualization">
             </div>
-            <!-- Selection -->
-            <div id="select-x"></div>
           </div>
         </div>
-        <button onCLick="onButtonClick()">Push me!</button>
+        <div class="row row-margin">
+          <div class="col">
+            <!-- Selection -->
+            <div id="select-x-wrapper">
+              X-axis variable selector
+                <form class="form-group" id="select-x">
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
       <script type="text/javascript" src="app.bundle.js" charset="utf-8"></script>
-
     </body>
 </html>
