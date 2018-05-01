@@ -5,6 +5,7 @@ import './static/scss/index.scss'
 import data from '../../wrangling/births_with_population.json'
 import * as Scatterplot from './scatterplot'
 import createSelect from './select'
+import cityDetails from './cityDetails'
 
 var margin = {top: 30, right: 50, bottom: 40, left: 40};
 var width = 960 - margin.left - margin.right;
@@ -53,7 +54,7 @@ const attributesToString = {
 	'Births2016': 'Births in 2016',
 	'Births2017': 'Births in 2017',
 	'BirthsChange%': 'Change in births, %',
-
+	'Region': 'Region'
 }
 
 const initApp = () => {
@@ -61,7 +62,7 @@ const initApp = () => {
 	state = R.merge(state, scales)
 	const svg = Scatterplot.renderBase('#visualization', margin, width, height, state, attributesToString)
 	state = R.merge(state, {svg})
-	Scatterplot.renderBubbles(state)
+	Scatterplot.renderBubbles(state, bubbleClickHandler)
 	Scatterplot.renderLegend(state, width)
 	window.handleXSelectChange = handleXSelectChange
 	window.handleYSelectChange = handleYSelectChange
@@ -73,7 +74,7 @@ const updateState = (newState) => {
 	const newScales = Scatterplot.scales(state, width, height)
 	state = R.merge(state, newState)
 	Scatterplot.redrawAxis(state, attributesToString)
-	Scatterplot.renderBubbles(state)
+	Scatterplot.renderBubbles(state, bubbleClickHandler)
 	Scatterplot.renderLegend(state, width)
 	console.log(state)
 }
@@ -88,5 +89,14 @@ const handleYSelectChange = (val) => {
 	updateState({'yAttribute': val, yAxis})
 }
 
+const bubbleClickHandler = (city) => {
+	var cityNode = document.getElementById('city-details');
+	while (cityNode.firstChild) {
+	    cityNode.removeChild(cityNode.firstChild);
+	}
+	cityDetails(city, 'city-details')
+}
 
 initApp()
+
+export { attributesToString, bubbleClickHandler }

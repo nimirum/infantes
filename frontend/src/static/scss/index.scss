@@ -1,6 +1,7 @@
 @import './baseline';
 @import './masthead';
 @import './colors';
+@import '/cityCard';
 
 #visualization {
 	display: flex;
@@ -52,4 +53,9 @@
 
 .legeng:hover rect{
 	fill-opacity:1;
+}
+
+.selected {
+	stroke-width: 5px;
+	stroke: $black;
 }
