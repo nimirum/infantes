@@ -1,10 +1,16 @@
 @import './baseline';
 @import './masthead';
 @import './colors';
+@import '/cityCard';
 
 #visualization {
 	display: flex;
 	justify-content: center;
+}
+
+.hovered {
+	stroke: $black;
+	stroke-width: 3px;
 }
 
 .label {
@@ -47,4 +53,9 @@
 
 .legeng:hover rect{
 	fill-opacity:1;
+}
+
+.selected {
+	stroke-width: 5px;
+	stroke: $black;
 }

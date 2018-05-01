@@ -1,4 +1,5 @@
 import * as d3 from "d3"
+import { bubbleClickHandler } from './index'
 
 const scales = (state, width, height) => {
   const { data, xAttribute, yAttribute, radiusAttribute } = state;
@@ -111,11 +112,14 @@ const updateYdim = (state, newYAttr, attributesToString) => {
 }
 
 
-const renderBubbles = (state) => {
+const renderBubbles = (state, bubbleClickHandler) => {
   const { svg, data, yAttribute, xAttribute, xScale, yScale, radius, color } = state
   var bubble = svg.selectAll('.bubble').data(data)
 
   bubble.enter().append('circle')
+    .on('mouseover', onBubbleMouseOver)
+    .on('click', onBubbleClick)
+    .on('mouseleave', onBubbleMouseExit)
     .attr('class', 'bubble')
     .attr('cx', function(d){return xScale(d[xAttribute]);})
     .attr('cy', function(d){return yScale(d[yAttribute]); })
@@ -125,9 +129,33 @@ const renderBubbles = (state) => {
       .attr('x', function(d){ return radius(d.Population); })
       .text(function(d){
         return d.Area;
-      });
+      })
+
 
   bubble.exit().remove();
+}
+
+/* Events cannot be an arrow function, because this won't be properly set */
+
+function onBubbleClick(city) {
+  const bubbles = d3.selectAll('.bubble').classed('selected', false)
+  d3.select(this).classed('selected', true)
+  bubbleClickHandler(city)
+}
+
+function onBubbleMouseOver(city) {
+    d3.select(this)
+      .classed('hovered', true)
+      .insert('text')
+        .attr('x', 20)
+        .attr('y', 20)
+        .attr('font-size', "20px")
+        .attr('fill', 'black')
+        .text((c) => 'Hei!')
+}
+
+function onBubbleMouseExit(city) {
+  d3.select(this).classed('hovered', false)
 }
 
 const renderLegend = (state, width) => {
