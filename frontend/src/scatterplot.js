@@ -116,6 +116,8 @@ const renderBubbles = (state) => {
   var bubble = svg.selectAll('.bubble').data(data)
 
   bubble.enter().append('circle')
+    .on('mouseover', onBubbleMouseOver)
+    .on('mouseleave', onBubbleMouseExit)
     .attr('class', 'bubble')
     .attr('cx', function(d){return xScale(d[xAttribute]);})
     .attr('cy', function(d){return yScale(d[yAttribute]); })
@@ -125,9 +127,26 @@ const renderBubbles = (state) => {
       .attr('x', function(d){ return radius(d.Population); })
       .text(function(d){
         return d.Area;
-      });
+      })
+
 
   bubble.exit().remove();
+}
+
+/* Events cannot be an arrow function, because this won't be properly set */
+function onBubbleMouseOver(city) {
+    d3.select(this)
+      .classed('hovered', true)
+      .insert('text')
+        .attr('x', 20)
+        .attr('y', 20)
+        .attr('font-size', "20px")
+        .attr('fill', 'black')
+        .text((c) => 'Hei!')
+}
+
+function onBubbleMouseExit(city) {
+  d3.select(this).classed('hovered', false)
 }
 
 const renderLegend = (state, width) => {
