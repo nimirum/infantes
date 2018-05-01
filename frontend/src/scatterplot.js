@@ -57,13 +57,6 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
   	.attr('class', 'y-axis')
   	.call(yAxis);
 
-  svg.append('rect')
-  	.attr('x', 0)
-  	.attr('y', yScale(1))
-  	.attr('width', width)
-  	.attr('height', 1)
-  	.style('fill', '#c3c3c3')
-
   svg.append('text')
     .attr('x', 10)
     .attr('y', 10)
