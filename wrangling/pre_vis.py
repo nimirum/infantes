@@ -20,7 +20,6 @@ def get_json_births_data():
     df2.replace(-np.inf, 0, inplace=True)
     df2.to_json('births_with_population.json', orient='records', force_ascii=True)
     print(df2.head())
-
     #init_notebook_mode(connected=False)
     #data = [go.Scatter(
     #    y=df2['Births2016'],
@@ -57,7 +56,7 @@ def get_data():
     del births['index']
     births['Area'].replace('Maarianhamina - Mariehamn', 'Maarianhamina', inplace=True)
 
-    #print(births.head())
+
     return births
 
 
@@ -69,6 +68,7 @@ def get_kuntadata():
     unemployment = pd.read_csv("../data/tyottomat_2016.csv", encoding='utf8', sep=';')
     unemployment = unemployment[['Alue', 'Miehet Ikäluokat yhteensä 2016', 'Naiset Ikäluokat yhteensä 2016']]
     unemployment.columns = ['Area', 'MenUnemployed2016', 'WomenUnemployed2016']
+    unemployment['Area'].replace('Maarianhamina - Mariehamn', 'Maarianhamina', inplace=True)
 
     workforce = pd.read_csv("../data/tyovoima_2016.csv", encoding='utf8', sep=';')
     workforce = workforce[['Alue', 'Miehet Ikäluokat yhteensä 2016', 'Naiset Ikäluokat yhteensä 2016']]
@@ -76,7 +76,6 @@ def get_kuntadata():
     unemployment['MenUnemployed2016'] = (unemployment['MenUnemployed2016'] / workforce['MenWorkForce2016']) * 100
     unemployment['WomenUnemployed2016'] = (unemployment['WomenUnemployed2016'] / workforce['WomenWorkForce2016']) * 100
     muncipilaties = pd.merge(right=muncipilaties, left=unemployment, how='left', on='Area')
-    #print(muncipilaties.head())
 
     keys = pd.read_csv("../data/kuntien_avainluvut_2000_2017.csv", encoding='utf8', sep=';')
     keys['Alue'] = keys['Alue 2017']
