@@ -53,7 +53,7 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
 
   svg.append('g')
   	.attr('transform', 'translate(0,0)')
-  	.attr('class', 'y axis')
+  	.attr('class', 'y-axis')
   	.call(yAxis);
 
   svg.append('rect')
@@ -81,14 +81,17 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
   return svg
 
 }
-const redrawXAxis = (state, attributesToString) => {
-  const { xAttribute, data, xScale, svg, xAxis } = state
+const redrawAxis = (state, attributesToString) => {
+  const { xAttribute, yAttribute, data, xScale, yScale, svg, xAxis, yAxis } = state
   svg.selectAll('.x-axis').call(xAxis)
   svg.selectAll('#x-label').text(attributesToString[xAttribute])
+  svg.selectAll('.y-axis').call(yAxis)
+  svg.selectAll('#y-label').text(attributesToString[yAttribute])
   svg.selectAll('.bubble')
     .transition()
     .duration(1000)
     .attr('cx', (d) => xScale(d[xAttribute]))
+    .attr('cy', (d) => yScale(d[yAttribute]))
 }
 
 const updateXdim = (state, newXAttr, attributesToString) => {
@@ -98,6 +101,15 @@ const updateXdim = (state, newXAttr, attributesToString) => {
   })).nice();
   return d3.axisBottom().scale(xScale);
 }
+
+const updateYdim = (state, newYAttr, attributesToString) => {
+  const { yScale, data } = state
+  yScale.domain(d3.extent(data, function(d){
+    return d[newYAttr];
+  })).nice();
+  return d3.axisLeft().scale(yScale);
+}
+
 
 const renderBubbles = (state) => {
   const { svg, data, yAttribute, xAttribute, xScale, yScale, radius, color } = state
@@ -150,4 +162,4 @@ const renderLegend = (state, width) => {
   })
 }
 
-export { renderBase, renderBubbles, scales, renderLegend, updateXdim, redrawXAxis };
+export { renderBase, renderBubbles, scales, renderLegend, updateXdim, updateYdim, redrawAxis };
