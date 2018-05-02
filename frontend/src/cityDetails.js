@@ -1,7 +1,6 @@
 import { attributesToString } from './index'
 
 const cityDetails = (city, targetEl) => {
-  console.log(city)
   const container = document.createElement('div')
   container.classList.add('card')
   const body = document.createElement('div')

@@ -57,6 +57,14 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
   	.attr('class', 'y-axis')
   	.call(yAxis);
 
+  svg.append('rect')
+    .attr('x', 0)
+    .attr('y', yScale(1))
+    .attr('width', width)
+    .attr('height', 1)
+    .attr('id', 'median-line')
+    .style('fill', '#c3c3c3')
+
   svg.append('text')
     .attr('x', 10)
     .attr('y', 10)
@@ -77,10 +85,22 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
 }
 const redrawAxis = (state, attributesToString) => {
   const { xAttribute, yAttribute, data, xScale, yScale, svg, xAxis, yAxis } = state
+  const medianLineY = {
+    'BirthsPopulationRatio': 1,
+    'BirthDeathSum': 0,
+    'Births2015': 0,
+    'Births2016': 0,
+    'Births2017': 0,
+    'BirthsChange%': 0,
+  }
   svg.selectAll('.x-axis').call(xAxis)
   svg.selectAll('#x-label').text(attributesToString[xAttribute])
   svg.selectAll('.y-axis').call(yAxis)
   svg.selectAll('#y-label').text(attributesToString[yAttribute])
+  svg.select('#median-line')
+    .transition()
+    .duration(1000)
+    .attr('y', yScale(medianLineY[yAttribute]))
   svg.selectAll('.bubble')
     .transition()
     .duration(1000)

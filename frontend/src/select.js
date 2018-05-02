@@ -1,5 +1,4 @@
 const createSelect = (options, targetElementId, onchangeHandlerName, attributesToString) => {
-  console.log(targetElementId)
   const select  = document.createElement('select')
   const options_ = options ? options : []
   options_.map((opt) => {
