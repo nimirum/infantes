@@ -7,9 +7,9 @@ import * as Scatterplot from './scatterplot'
 import createSelect from './select'
 import cityDetails from './cityDetails'
 
-var margin = {top: 30, right: 50, bottom: 40, left: 40};
-var width = 960 - margin.left - margin.right;
-var height = 500 - margin.top - margin.bottom;
+var margin = {top: 30, right: 100, bottom: 40, left: 40};
+var width = 1240 - margin.left - margin.right;
+var height = 600 - margin.top - margin.bottom;
 
 let state = {
 	data,

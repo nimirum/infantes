@@ -60,7 +60,7 @@ const renderBase = (targetHTML, margin, width, height, state, attributesToString
   svg.append('rect')
     .attr('x', 0)
     .attr('y', yScale(1))
-    .attr('width', width)
+    .attr('width', width - margin.right)
     .attr('height', 1)
     .attr('id', 'median-line')
     .style('fill', '#c3c3c3')
