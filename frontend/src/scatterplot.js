@@ -11,7 +11,7 @@ const scales = (state, width, height) => {
     .range([height, 0]);
 
   var radius = d3.scaleLinear()
-    .range([2,10]);
+    .range([4,15]);
 
   var xAxis = d3.axisBottom()
     .scale(xScale);
